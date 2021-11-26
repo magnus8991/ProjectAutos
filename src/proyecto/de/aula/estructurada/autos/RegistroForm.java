@@ -48,10 +48,15 @@ public class RegistroForm extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    void registrarIngresoTaller(){
+        String linea = crearLineaARegistrar();
+        
+    }
     
-    String crearLineaAregistrar()
-    {
-        return cedulaMecanico + ";" + nombreMecanico + ";";
+    String crearLineaARegistrar(){
+        return cedulaMecanico + ";" + nombreMecanico + ";" + apellidoMencanico + ";" +
+                ";" + cedulaPropietario + ";" + nombrePropietario + ";" + apellidoPropietario
+                + placa + ";" + marca + ";" + color + numeroLlantas + ";" + tipoDanio + ";" + costoArreglo;
     }
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
