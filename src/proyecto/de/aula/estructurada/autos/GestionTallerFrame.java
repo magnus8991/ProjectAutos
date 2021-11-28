@@ -10,10 +10,14 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.table.DefaultTableModel;
 
 public class GestionTallerFrame extends javax.swing.JFrame {
 
+    DefaultTableModel modeloTablaConsulta;
+    DefaultTableModel modeloTablaBusqueda;
     String ruta;
+    File file;
     
     //region Variables Mecanico
         String cedulaMecanico;
@@ -40,6 +44,7 @@ public class GestionTallerFrame extends javax.swing.JFrame {
         ruta = "TallerAutos.txt";
         initComponents();
         this.setVisible(true);
+        consultar();
     }
     
     @SuppressWarnings("unchecked")
@@ -78,7 +83,7 @@ public class GestionTallerFrame extends javax.swing.JFrame {
         register = new javax.swing.JButton();
         title = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
-        jTable1 = new javax.swing.JTable();
+        tableQuery = new javax.swing.JTable();
         jScrollPane2 = new javax.swing.JScrollPane();
         tableSearch = new javax.swing.JTable();
         panelOpcionesAdicionales = new javax.swing.JPanel();
@@ -199,6 +204,11 @@ public class GestionTallerFrame extends javax.swing.JFrame {
         });
 
         register.setText("Guardar");
+        register.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                registerActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout panelSaveLayout = new javax.swing.GroupLayout(panelSave);
         panelSave.setLayout(panelSaveLayout);
@@ -340,22 +350,15 @@ public class GestionTallerFrame extends javax.swing.JFrame {
 
         title.setText("TALLER DE AUTOS");
 
-        jTable1.setModel(new javax.swing.table.DefaultTableModel(
+        tableQuery.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null, null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null, null, null, null}
+
             },
             new String [] {
                 "CC. Mecanico", "Nombre", "Apellido", "CC. Dueño", "Nombre", "Apellido", "Placa", "Marca", "Color", "No. Llantas", "Tipo Daño", "Costo"
             }
         ));
-        jScrollPane1.setViewportView(jTable1);
+        jScrollPane1.setViewportView(tableQuery);
 
         tableSearch.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -435,7 +438,7 @@ public class GestionTallerFrame extends javax.swing.JFrame {
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                                     .addComponent(jScrollPane1)
-                                    .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 862, Short.MAX_VALUE)
+                                    .addComponent(jScrollPane2)
                                     .addComponent(panelOpcionesAdicionales, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                             .addGroup(layout.createSequentialGroup()
                                 .addGap(34, 34, 34)
@@ -526,6 +529,10 @@ public class GestionTallerFrame extends javax.swing.JFrame {
     private void textIngresosTotalesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_textIngresosTotalesActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_textIngresosTotalesActionPerformed
+
+    private void registerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_registerActionPerformed
+        registrarIngresoTaller();
+    }//GEN-LAST:event_registerActionPerformed
  
     //region Metodos Ingreso auto al parqueadero
     
@@ -552,14 +559,13 @@ public class GestionTallerFrame extends javax.swing.JFrame {
         
         String crearLineaARegistrar(){
             return cedulaMecanico + ";" + nombreMecanico + ";" + apellidoMencanico + ";" +
-                    cedulaPropietario + ";" + nombrePropietario + ";" + apellidoPropietario
-                    + placa + ";" + marca + ";" + color + numeroLlantas + ";" + tipoDanio + ";" + costoArreglo;
+                    cedulaPropietario + ";" + nombrePropietario + ";" + apellidoPropietario + ";"
+                    + placa + ";" + marca + ";" + color + ";" + numeroLlantas + ";" + tipoDanio + ";" + costoArreglo;
         }
 
         void agregarNuevoIngreso(String linea){
-
             try {
-                File file = new File(ruta);
+                file = new File(ruta);
                 FileWriter fileWriter = new FileWriter(file, true);
                 PrintWriter printWriter = new PrintWriter(fileWriter);
                 printWriter.println(linea);
@@ -574,15 +580,19 @@ public class GestionTallerFrame extends javax.swing.JFrame {
         
     //region Metodos Consulta
         
-        void consultar() {
+    void consultar() {
         try {
-            String linea;
-            FileReader fileReader = new FileReader(ruta);
-            BufferedReader bufferedReader = new BufferedReader(fileReader);
-            while ((linea = bufferedReader.readLine()) != null) {
-                
+            file = new File(ruta);
+            if(file.exists()){
+                String linea;
+                FileReader fileReader = new FileReader(ruta);
+                BufferedReader bufferedReader = new BufferedReader(fileReader);
+                while ((linea = bufferedReader.readLine()) != null) {
+                    mapearDatos(linea);
+                    InsertarFila();
+                }
+                bufferedReader.close();
             }
-        bufferedReader.close();
         } catch (FileNotFoundException ex) {
             Logger.getLogger(GestionTallerFrame.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
@@ -590,7 +600,7 @@ public class GestionTallerFrame extends javax.swing.JFrame {
         }
         
     }
-
+    
     //endregion 
     
     //region Utilidades
@@ -611,6 +621,24 @@ public class GestionTallerFrame extends javax.swing.JFrame {
             tipoDanio = datos[10];
             costoArreglo = Float.parseFloat(datos[11]);
         }
+        
+        public void InsertarFila() {
+            String[] datos = new String[12];
+            datos[0] = cedulaMecanico;
+            datos[1] = nombreMecanico;
+            datos[2] = apellidoMencanico;
+            datos[3] = cedulaPropietario;
+            datos[4] = nombrePropietario;
+            datos[5] = apellidoPropietario;
+            datos[6] = placa;
+            datos[7] = marca;
+            datos[8] = color;
+            datos[9] = numeroLlantas;
+            datos[10] = tipoDanio;
+            datos[11] = String.valueOf(costoArreglo);
+            DefaultTableModel model = (DefaultTableModel) tableQuery.getModel();
+            model.addRow(datos);
+        }
 
     //endregion
     
@@ -624,7 +652,6 @@ public class GestionTallerFrame extends javax.swing.JFrame {
     private javax.swing.JLabel dataVehicle;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
-    private javax.swing.JTable jTable1;
     private javax.swing.JLabel labelApellidoMechanic;
     private javax.swing.JLabel labelApellidoOwner;
     private javax.swing.JLabel labelCedulaCliente;
@@ -642,6 +669,7 @@ public class GestionTallerFrame extends javax.swing.JFrame {
     private javax.swing.JPanel panelOpcionesAdicionales;
     private javax.swing.JPanel panelSave;
     private javax.swing.JButton register;
+    private javax.swing.JTable tableQuery;
     private javax.swing.JTable tableSearch;
     private javax.swing.JTextField textApellidoMechanic;
     private javax.swing.JTextField textApellidoOwner;
