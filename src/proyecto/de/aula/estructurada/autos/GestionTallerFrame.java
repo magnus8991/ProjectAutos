@@ -1,9 +1,13 @@
 
 package proyecto.de.aula.estructurada.autos;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -27,7 +31,7 @@ public class GestionTallerFrame extends javax.swing.JFrame {
         String placa;
         String marca;
         String color;
-        int numeroLlantas;
+        String numeroLlantas;
         String tipoDanio;
         float costoArreglo;
     //endregion 
@@ -35,6 +39,7 @@ public class GestionTallerFrame extends javax.swing.JFrame {
     public GestionTallerFrame() {
         ruta = "TallerAutos.txt";
         initComponents();
+        this.setVisible(true);
     }
     
     @SuppressWarnings("unchecked")
@@ -522,28 +527,92 @@ public class GestionTallerFrame extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_textIngresosTotalesActionPerformed
  
-    void registrarIngresoTaller(){
+    //region Metodos Ingreso auto al parqueadero
+    
+        void registrarIngresoTaller(){
+        asignarDatosFormulario();
         String linea = crearLineaARegistrar();
         agregarNuevoIngreso(linea);
     }
     
-    void agregarNuevoIngreso(String linea){
+        void asignarDatosFormulario(){
+            cedulaMecanico = textCedulaMechanic.getText();
+            nombreMecanico =  textNombreMechanic.getText();
+            apellidoMencanico =  textApellidoMechanic.getText();
+            cedulaPropietario =  textCedulaOwner.getText();
+            nombrePropietario =  textNombreOwner.getText();
+            apellidoPropietario =  textApellidoOwner.getText();
+            placa =  textPlaca.getText();
+            marca =  textMarca.getText();
+            color =  textColor.getText();
+            numeroLlantas = textNumeroLlantas.getText();
+            tipoDanio = textTipoDanio.getText();
+            costoArreglo = Float.parseFloat(textCosto.getText());
+        }
         
+        String crearLineaARegistrar(){
+            return cedulaMecanico + ";" + nombreMecanico + ";" + apellidoMencanico + ";" +
+                    cedulaPropietario + ";" + nombrePropietario + ";" + apellidoPropietario
+                    + placa + ";" + marca + ";" + color + numeroLlantas + ";" + tipoDanio + ";" + costoArreglo;
+        }
+
+        void agregarNuevoIngreso(String linea){
+
+            try {
+                File file = new File(ruta);
+                FileWriter fileWriter = new FileWriter(file, true);
+                PrintWriter printWriter = new PrintWriter(fileWriter);
+                printWriter.println(linea);
+                fileWriter.close();
+                printWriter.close();
+            } catch (IOException ex) {
+                Logger.getLogger(GestionTallerFrame.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+
+    //endregion
+        
+    //region Metodos Consulta
+        
+        void consultar() {
         try {
-            File file = new File(ruta);
-            FileWriter fileWriter = new FileWriter(file, true);
-            fileWriter.write(linea);
-            fileWriter.close();
+            String linea;
+            FileReader fileReader = new FileReader(ruta);
+            BufferedReader bufferedReader = new BufferedReader(fileReader);
+            while ((linea = bufferedReader.readLine()) != null) {
+                
+            }
+        bufferedReader.close();
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(GestionTallerFrame.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
             Logger.getLogger(GestionTallerFrame.class.getName()).log(Level.SEVERE, null, ex);
         }
+        
     }
+
+    //endregion 
     
-    String crearLineaARegistrar(){
-        return cedulaMecanico + ";" + nombreMecanico + ";" + apellidoMencanico + ";" +
-                ";" + cedulaPropietario + ";" + nombrePropietario + ";" + apellidoPropietario
-                + placa + ";" + marca + ";" + color + numeroLlantas + ";" + tipoDanio + ";" + costoArreglo;
-    }
+    //region Utilidades
+        
+        public void mapearDatos(String linea)
+        {
+            String [] datos = linea.split(";");
+            cedulaMecanico =  datos[0];
+            nombreMecanico =  datos[1];
+            apellidoMencanico =  datos[2];
+            cedulaPropietario =  datos[3];
+            nombrePropietario =  datos[4];
+            apellidoPropietario =  datos[5];
+            placa =  datos[6];
+            marca =  datos[7];
+            color =  datos[8];
+            numeroLlantas = datos[9];
+            tipoDanio = datos[10];
+            costoArreglo = Float.parseFloat(datos[11]);
+        }
+
+    //endregion
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton buttonDelete;
