@@ -152,9 +152,9 @@
                                   <Component id="textCosto" min="-2" pref="100" max="-2" attributes="0"/>
                               </Group>
                               <Group type="102" alignment="1" attributes="0">
-                                  <Component id="labelTipoDaño" min="-2" max="-2" attributes="0"/>
+                                  <Component id="labelTipoDanio" min="-2" max="-2" attributes="0"/>
                                   <EmptySpace type="separate" max="-2" attributes="0"/>
-                                  <Component id="textTipoDaño" min="-2" pref="100" max="-2" attributes="0"/>
+                                  <Component id="textTipoDanio" min="-2" pref="100" max="-2" attributes="0"/>
                               </Group>
                               <Group type="102" alignment="1" attributes="0">
                                   <Group type="103" groupAlignment="1" attributes="0">
@@ -243,8 +243,8 @@
                                   <Component id="dataService" min="-2" max="-2" attributes="0"/>
                                   <EmptySpace type="separate" max="-2" attributes="0"/>
                                   <Group type="103" groupAlignment="3" attributes="0">
-                                      <Component id="textTipoDaño" alignment="3" min="-2" max="-2" attributes="0"/>
-                                      <Component id="labelTipoDaño" alignment="3" min="-2" max="-2" attributes="0"/>
+                                      <Component id="textTipoDanio" alignment="3" min="-2" max="-2" attributes="0"/>
+                                      <Component id="labelTipoDanio" alignment="3" min="-2" max="-2" attributes="0"/>
                                   </Group>
                                   <EmptySpace type="unrelated" max="-2" attributes="0"/>
                                   <Group type="103" groupAlignment="3" attributes="0">
@@ -391,14 +391,14 @@
             <Property name="text" type="java.lang.String" value="Datos del servicio"/>
           </Properties>
         </Component>
-        <Component class="javax.swing.JLabel" name="labelTipoDa&#xf1;o">
+        <Component class="javax.swing.JLabel" name="labelTipoDanio">
           <Properties>
             <Property name="text" type="java.lang.String" value="Tipo de da&#xf1;o:"/>
           </Properties>
         </Component>
-        <Component class="javax.swing.JTextField" name="textTipoDa&#xf1;o">
+        <Component class="javax.swing.JTextField" name="textTipoDanio">
           <Events>
-            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="textTipoDa&#xf1;oActionPerformed"/>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="textTipoDanioActionPerformed"/>
           </Events>
         </Component>
         <Component class="javax.swing.JLabel" name="labelCosto">

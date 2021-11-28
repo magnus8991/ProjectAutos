@@ -66,8 +66,8 @@ public class GestionTallerFrame extends javax.swing.JFrame {
         labelPlaca = new javax.swing.JLabel();
         textPlaca = new javax.swing.JTextField();
         dataService = new javax.swing.JLabel();
-        labelTipoDaño = new javax.swing.JLabel();
-        textTipoDaño = new javax.swing.JTextField();
+        labelTipoDanio = new javax.swing.JLabel();
+        textTipoDanio = new javax.swing.JTextField();
         labelCosto = new javax.swing.JLabel();
         textCosto = new javax.swing.JTextField();
         register = new javax.swing.JButton();
@@ -177,11 +177,11 @@ public class GestionTallerFrame extends javax.swing.JFrame {
 
         dataService.setText("Datos del servicio");
 
-        labelTipoDaño.setText("Tipo de daño:");
+        labelTipoDanio.setText("Tipo de daño:");
 
-        textTipoDaño.addActionListener(new java.awt.event.ActionListener() {
+        textTipoDanio.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                textTipoDañoActionPerformed(evt);
+                textTipoDanioActionPerformed(evt);
             }
         });
 
@@ -245,9 +245,9 @@ public class GestionTallerFrame extends javax.swing.JFrame {
                                 .addGap(18, 18, 18)
                                 .addComponent(textCosto, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addGroup(panelSaveLayout.createSequentialGroup()
-                                .addComponent(labelTipoDaño)
+                                .addComponent(labelTipoDanio)
                                 .addGap(18, 18, 18)
-                                .addComponent(textTipoDaño, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addComponent(textTipoDanio, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addGroup(panelSaveLayout.createSequentialGroup()
                                 .addGroup(panelSaveLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                                     .addGroup(javax.swing.GroupLayout.Alignment.LEADING, panelSaveLayout.createSequentialGroup()
@@ -316,8 +316,8 @@ public class GestionTallerFrame extends javax.swing.JFrame {
                                 .addComponent(dataService)
                                 .addGap(18, 18, 18)
                                 .addGroup(panelSaveLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                    .addComponent(textTipoDaño, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(labelTipoDaño))
+                                    .addComponent(textTipoDanio, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(labelTipoDanio))
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                                 .addGroup(panelSaveLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                                     .addComponent(textCosto, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -506,9 +506,9 @@ public class GestionTallerFrame extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_textPlacaActionPerformed
 
-    private void textTipoDañoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_textTipoDañoActionPerformed
+    private void textTipoDanioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_textTipoDanioActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_textTipoDañoActionPerformed
+    }//GEN-LAST:event_textTipoDanioActionPerformed
 
     private void textCostoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_textCostoActionPerformed
         // TODO add your handling code here:
@@ -569,7 +569,7 @@ public class GestionTallerFrame extends javax.swing.JFrame {
     private javax.swing.JLabel labelNombreOwner;
     private javax.swing.JLabel labelNumeroLlantas;
     private javax.swing.JLabel labelPlaca;
-    private javax.swing.JLabel labelTipoDaño;
+    private javax.swing.JLabel labelTipoDanio;
     private javax.swing.JPanel panelOpcionesAdicionales;
     private javax.swing.JPanel panelSave;
     private javax.swing.JButton register;
@@ -587,7 +587,7 @@ public class GestionTallerFrame extends javax.swing.JFrame {
     private javax.swing.JTextField textNombreOwner;
     private javax.swing.JTextField textNumeroLlantas;
     private javax.swing.JTextField textPlaca;
-    private javax.swing.JTextField textTipoDaño;
+    private javax.swing.JTextField textTipoDanio;
     private javax.swing.JLabel title;
     // End of variables declaration//GEN-END:variables
 }
