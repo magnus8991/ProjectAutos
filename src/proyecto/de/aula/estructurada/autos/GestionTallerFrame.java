@@ -1,6 +1,6 @@
-
 package proyecto.de.aula.estructurada.autos;
 
+import java.awt.Component;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -8,45 +8,51 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.nio.file.Files;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JDialog;
+import javax.swing.JOptionPane;
+import javax.swing.JTable;
+import javax.swing.JTextField;
 import javax.swing.table.DefaultTableModel;
 
 public class GestionTallerFrame extends javax.swing.JFrame {
 
     DefaultTableModel modeloTablaConsulta;
     DefaultTableModel modeloTablaBusqueda;
-    String ruta;
     File file;
-    
+    String ruta;
+
     //region Variables Mecanico
-        String cedulaMecanico;
-        String nombreMecanico;
-        String apellidoMencanico;
+    String cedulaMecanico;
+    String nombreMecanico;
+    String apellidoMecanico;
     //endregion
-        
+
     //region Variables Propietario
-        String cedulaPropietario;
-        String nombrePropietario;
-        String apellidoPropietario;
+    String cedulaPropietario;
+    String nombrePropietario;
+    String apellidoPropietario;
     //endregion    
-        
+
     //region Variables Auto
-        String placa;
-        String marca;
-        String color;
-        String numeroLlantas;
-        String tipoDanio;
-        float costoArreglo;
+    String placa;
+    String marca;
+    String color;
+    String numeroLlantas;
+    String tipoDanio;
+    float costoArreglo;
+    float ingresosTotales;
     //endregion 
-    
+
     public GestionTallerFrame() {
         ruta = "TallerAutos.txt";
         initComponents();
         this.setVisible(true);
         consultar();
     }
-    
+
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
@@ -362,7 +368,7 @@ public class GestionTallerFrame extends javax.swing.JFrame {
 
         tableSearch.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null, null, null, null, null, null, null, null, null, null}
+
             },
             new String [] {
                 "CC. Mecanico", "Nombre", "Apellido", "CC. Dueño", "Nombre", "Apellido", "Placa", "Marca", "Color", "No. Llantas", "Tipo Daño", "Costo"
@@ -381,10 +387,20 @@ public class GestionTallerFrame extends javax.swing.JFrame {
         });
 
         buttonSearch.setText("Buscar");
+        buttonSearch.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                buttonSearchActionPerformed(evt);
+            }
+        });
 
         buttonEdit.setText("Editar");
 
         buttonDelete.setText("Eliminar");
+        buttonDelete.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                buttonDeleteActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout panelOpcionesAdicionalesLayout = new javax.swing.GroupLayout(panelOpcionesAdicionales);
         panelOpcionesAdicionales.setLayout(panelOpcionesAdicionalesLayout);
@@ -418,6 +434,7 @@ public class GestionTallerFrame extends javax.swing.JFrame {
 
         labelIngresosTotales.setText("Ingresos totales por autos atendidos:");
 
+        textIngresosTotales.setEditable(false);
         textIngresosTotales.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 textIngresosTotalesActionPerformed(evt);
@@ -533,64 +550,166 @@ public class GestionTallerFrame extends javax.swing.JFrame {
     private void registerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_registerActionPerformed
         registrarIngresoTaller();
     }//GEN-LAST:event_registerActionPerformed
- 
-    //region Metodos Ingreso auto al parqueadero
-    
-        void registrarIngresoTaller(){
-        asignarDatosFormulario();
-        String linea = crearLineaARegistrar();
-        agregarNuevoIngreso(linea);
-    }
-    
-        void asignarDatosFormulario(){
-            cedulaMecanico = textCedulaMechanic.getText();
-            nombreMecanico =  textNombreMechanic.getText();
-            apellidoMencanico =  textApellidoMechanic.getText();
-            cedulaPropietario =  textCedulaOwner.getText();
-            nombrePropietario =  textNombreOwner.getText();
-            apellidoPropietario =  textApellidoOwner.getText();
-            placa =  textPlaca.getText();
-            marca =  textMarca.getText();
-            color =  textColor.getText();
-            numeroLlantas = textNumeroLlantas.getText();
-            tipoDanio = textTipoDanio.getText();
-            costoArreglo = Float.parseFloat(textCosto.getText());
-        }
-        
-        String crearLineaARegistrar(){
-            return cedulaMecanico + ";" + nombreMecanico + ";" + apellidoMencanico + ";" +
-                    cedulaPropietario + ";" + nombrePropietario + ";" + apellidoPropietario + ";"
-                    + placa + ";" + marca + ";" + color + ";" + numeroLlantas + ";" + tipoDanio + ";" + costoArreglo;
-        }
 
-        void agregarNuevoIngreso(String linea){
+    private void buttonSearchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonSearchActionPerformed
+        String cedula = textCedulaCliente.getText();
+        if (cedula.isEmpty()) {
+            JOptionPane.showMessageDialog(null, "Debe digitar la cédula a buscar");
+        } else {
             try {
-                file = new File(ruta);
-                FileWriter fileWriter = new FileWriter(file, true);
-                PrintWriter printWriter = new PrintWriter(fileWriter);
-                printWriter.println(linea);
-                fileWriter.close();
-                printWriter.close();
-            } catch (IOException ex) {
-                Logger.getLogger(GestionTallerFrame.class.getName()).log(Level.SEVERE, null, ex);
+                Integer.parseInt(cedula);
+                String[] datos = buscarCliente(cedula);
+                if (datos != null) {
+                    if (tableSearch.getRowCount() > 0) {
+                        EliminarFila(tableSearch, 0);
+                    }
+                    InsertarFila(tableSearch, datos);
+                } else {
+                    JOptionPane.showMessageDialog(null, "Cliente no encontrado");
+                    if (tableSearch.getRowCount() > 0) {
+                        EliminarFila(tableSearch, 0);
+                    }
+                }
+            } catch (NumberFormatException e) {
+                JOptionPane.showMessageDialog(null, "Debe digitar una cédula válida");
+                if (tableSearch.getRowCount() > 0) {
+                    EliminarFila(tableSearch, 0);
+                }
             }
         }
+    }//GEN-LAST:event_buttonSearchActionPerformed
 
-    //endregion
-        
-    //region Metodos Consulta
-        
-    void consultar() {
+    private void buttonDeleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonDeleteActionPerformed
+        if (tableSearch.getRowCount() > 0) {
+            String cedula = tableSearch.getValueAt(0, 3).toString();
+            String message = eliminarRegistro(cedula);
+            if (message != null) {
+                restarTotal();
+                for (int i = 0; i < tableQuery.getRowCount(); i++) {
+                    if (cedula.equals(tableQuery.getValueAt(i, 3))) {
+                        EliminarFila(tableQuery, i);
+                        EliminarFila(tableSearch, 0);
+                    }
+                }
+                JOptionPane.showMessageDialog(null, message);
+            } else {
+                JOptionPane.showMessageDialog(null, "No se ha podido eliminar el registro");
+            }
+        } else {
+            JOptionPane.showMessageDialog(null, "Debe buscar el registro a eliminar");
+        }
+    }//GEN-LAST:event_buttonDeleteActionPerformed
+
+    //region Metodos Ingreso auto al parqueadero
+    void registrarIngresoTaller() {
+        String message = asignarDatosFormulario();
+        if (existeCampoVacio()) {
+            JOptionPane.showMessageDialog(null, "Verifique que todos los campos estén digitados");
+        } else {
+            if (message == null) {
+                if (cedulaClienteRepetida() || placaRepetida()) {
+                    JOptionPane.showMessageDialog(null, cedulaClienteRepetida() ? "El cliente con cédula "
+                            + cedulaPropietario + " ya existe" : "El auto con placa " + placa + " ya fue registrado");
+                } else {
+                    String linea = crearLineaARegistrar();
+                    String messageRegister = agregarNuevoIngreso(linea);
+                    if (messageRegister == null) {
+                        JOptionPane.showMessageDialog(null, "Error al guardar");
+                    } else {
+                        JOptionPane.showMessageDialog(null, messageRegister);
+                        String[] datos = linea.split(";");
+                        InsertarFila(tableQuery, datos);
+                        sumarTotal(datos[11]);
+                    }
+                }
+            } else {
+                JOptionPane.showMessageDialog(null, message);
+            }
+        }
+    }
+
+    boolean existeCampoVacio() {
+        return cedulaMecanico.isEmpty() ? true : nombreMecanico.isEmpty() ? true
+                : apellidoMecanico.isEmpty() ? true : cedulaPropietario.isEmpty() ? true
+                : nombrePropietario.isEmpty() ? true : apellidoPropietario.isEmpty() ? true
+                : placa.isEmpty() ? true : marca.isEmpty() ? true : color.isEmpty() ? true
+                : numeroLlantas.isEmpty() ? true : tipoDanio.isEmpty() ? true : false;
+    }
+
+    String asignarDatosFormulario() {
+        cedulaMecanico = textCedulaMechanic.getText();
+        nombreMecanico = textNombreMechanic.getText();
+        apellidoMecanico = textApellidoMechanic.getText();
+        cedulaPropietario = textCedulaOwner.getText();
+        nombrePropietario = textNombreOwner.getText();
+        apellidoPropietario = textApellidoOwner.getText();
+        placa = textPlaca.getText();
+        marca = textMarca.getText();
+        color = textColor.getText();
+        numeroLlantas = textNumeroLlantas.getText();
+        tipoDanio = textTipoDanio.getText();
+        try {
+            costoArreglo = Float.parseFloat(textCosto.getText());
+        } catch (NumberFormatException e) {
+            costoArreglo = 0;
+            return "Verifique el valor del costo";
+        }
+        return null;
+    }
+
+    boolean cedulaClienteRepetida() {
+        for (int i = 0; i < tableQuery.getRowCount(); i++) {
+            if (cedulaPropietario.equals(tableQuery.getValueAt(i, 3))) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    boolean placaRepetida() {
+        for (int i = 0; i < tableQuery.getRowCount(); i++) {
+            if (placa.equals(tableQuery.getValueAt(i, 6))) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    String crearLineaARegistrar() {
+        return cedulaMecanico + ";" + nombreMecanico + ";" + apellidoMecanico + ";"
+                + cedulaPropietario + ";" + nombrePropietario + ";" + apellidoPropietario + ";"
+                + placa + ";" + marca + ";" + color + ";" + numeroLlantas + ";" + tipoDanio + ";" + costoArreglo;
+    }
+
+    String agregarNuevoIngreso(String linea) {
         try {
             file = new File(ruta);
-            if(file.exists()){
+            FileWriter fileWriter = new FileWriter(file, true);
+            PrintWriter printWriter = new PrintWriter(fileWriter);
+            printWriter.println(linea);
+            fileWriter.close();
+            printWriter.close();
+            return "Registro exitoso";
+        } catch (IOException ex) {
+            Logger.getLogger(GestionTallerFrame.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return null;
+    }
+
+    String[] buscarCliente(String cedula) {
+        try {
+            file = new File(ruta);
+            if (file.exists()) {
                 String linea;
-                FileReader fileReader = new FileReader(ruta);
+                FileReader fileReader = new FileReader(file);
                 BufferedReader bufferedReader = new BufferedReader(fileReader);
                 while ((linea = bufferedReader.readLine()) != null) {
-                    mapearDatos(linea);
-                    InsertarFila();
+                    String[] datos = linea.split(";");
+                    if (datos[3].equals(cedula)) {
+                        return datos;
+                    }
                 }
+                fileReader.close();
                 bufferedReader.close();
             }
         } catch (FileNotFoundException ex) {
@@ -598,50 +717,139 @@ public class GestionTallerFrame extends javax.swing.JFrame {
         } catch (IOException ex) {
             Logger.getLogger(GestionTallerFrame.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
+        return null;
     }
-    
-    //endregion 
-    
-    //region Utilidades
-        
-        public void mapearDatos(String linea)
-        {
-            String [] datos = linea.split(";");
-            cedulaMecanico =  datos[0];
-            nombreMecanico =  datos[1];
-            apellidoMencanico =  datos[2];
-            cedulaPropietario =  datos[3];
-            nombrePropietario =  datos[4];
-            apellidoPropietario =  datos[5];
-            placa =  datos[6];
-            marca =  datos[7];
-            color =  datos[8];
-            numeroLlantas = datos[9];
-            tipoDanio = datos[10];
-            costoArreglo = Float.parseFloat(datos[11]);
+
+    String eliminarRegistro(String cedula) {
+        String[] lineas = obtenerLineas(cedula);
+        boolean eliminado = borrarFichero();
+        if (eliminado) {
+            for (String lineaNueva : lineas) {
+                agregarNuevoIngreso(lineaNueva);
+            }
+            return "Registro eliminado con éxito";
         }
-        
-        public void InsertarFila() {
-            String[] datos = new String[12];
-            datos[0] = cedulaMecanico;
-            datos[1] = nombreMecanico;
-            datos[2] = apellidoMencanico;
-            datos[3] = cedulaPropietario;
-            datos[4] = nombrePropietario;
-            datos[5] = apellidoPropietario;
-            datos[6] = placa;
-            datos[7] = marca;
-            datos[8] = color;
-            datos[9] = numeroLlantas;
-            datos[10] = tipoDanio;
-            datos[11] = String.valueOf(costoArreglo);
-            DefaultTableModel model = (DefaultTableModel) tableQuery.getModel();
-            model.addRow(datos);
+        return null;
+    }
+
+    int obtenerNumeroLineas() {
+        try {
+            file = new File(ruta);
+            if (file.exists()) {
+                String linea;
+                FileReader fileReader = new FileReader(file);
+                BufferedReader bufferedReader = new BufferedReader(fileReader);
+                int numeroLineas = Integer.parseInt(String.valueOf(bufferedReader.lines().count()));
+                fileReader.close();
+                bufferedReader.close();
+                return numeroLineas;
+            }
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(GestionTallerFrame.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(GestionTallerFrame.class.getName()).log(Level.SEVERE, null, ex);
         }
+        return 0;
+    }
+
+    String[] obtenerLineas(String cedula) {
+        try {
+            file = new File(ruta);
+            if (file.exists()) {
+                String linea = "";
+                int i = 0;
+                String[] lineas = new String[obtenerNumeroLineas() - 1];
+                FileReader fileReader = new FileReader(file);
+                BufferedReader bufferedReader = new BufferedReader(fileReader);
+                while ((linea = bufferedReader.readLine()) != null) {
+                    String[] datos = linea.split(";");
+                    if (!cedula.equals(datos[3])) {
+                        lineas[i] = linea;
+                        i++;
+                    }
+                }
+                fileReader.close();
+                bufferedReader.close();
+                return lineas;
+            }
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(GestionTallerFrame.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(GestionTallerFrame.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return null;
+    }
 
     //endregion
-    
+    //region Metodos Consulta
+    void consultar() {
+        try {
+            file = new File(ruta);
+            if (file.exists()) {
+                String linea;
+                FileReader fileReader = new FileReader(file);
+                BufferedReader bufferedReader = new BufferedReader(fileReader);
+                ingresosTotales = 0;
+                while ((linea = bufferedReader.readLine()) != null) {
+                    String[] datos = linea.split(";");
+                    InsertarFila(tableQuery, datos);
+                    sumarTotal(datos[11]);
+                }
+                fileReader.close();
+                bufferedReader.close();
+            }
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(GestionTallerFrame.class
+                    .getName()).log(Level.SEVERE, null, ex);
+
+        } catch (IOException ex) {
+            Logger.getLogger(GestionTallerFrame.class
+                    .getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    //endregion 
+    //region Utilidades
+    public void InsertarFila(JTable table, String[] datos) {
+        DefaultTableModel model = (DefaultTableModel) table.getModel();
+        model.addRow(datos);
+    }
+
+    public void EliminarFila(JTable table, int index) {
+        DefaultTableModel model = (DefaultTableModel) table.getModel();
+        model.removeRow(index);
+    }
+
+    public void sumarTotal(String valor) {
+        ingresosTotales += Float.parseFloat(valor);
+        textIngresosTotales.setText(String.valueOf(ingresosTotales));
+    }
+
+    public void restarTotal() {
+        ingresosTotales -= Float.parseFloat(String.valueOf(tableSearch.getValueAt(0, 11)));
+        textIngresosTotales.setText(String.valueOf(ingresosTotales));
+    }
+
+    public void editarTotal(float valorActual, float valorNuevo) {
+        ingresosTotales = ingresosTotales - valorActual + valorNuevo;
+        textIngresosTotales.setText(String.valueOf(ingresosTotales));
+    }
+
+    boolean borrarFichero() {
+        try {
+            file = new File(ruta);
+            if (file.exists()) {
+                boolean eliminado = file.delete();
+                return eliminado;
+            }
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+        return false;
+    }
+
+    //endregion
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton buttonDelete;
     private javax.swing.JButton buttonEdit;
