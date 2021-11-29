@@ -1,1 +1,3 @@
-1003258091;Diego;Mandon;1003328475;Diego;Villa;EET59A;Nissan;Negro;4;Bateria defectuosa;250000.075367483;Carlos;Centeno;56992763;Juan;Perez;DFH33K;Mazda;Azul;4;Transmision rota;120000.0
+1003258091;Diego;Mandon;1003328475;Diego;Villa;EET59A;Nissan;Negro;4;Bateria defectuosa;250000.0
+84736475;Mario;Mendoza;44758666;Jesus;Melo;KBH78L;Hyundai;Gris;4;Transmision dañada;100000.0
+99374855;Juan;Perez;38475565;Carlos;Zambrano;IFY79O;Ford;Rojo;4;Llantas pinchadas;60000.0

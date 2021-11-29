@@ -44,13 +44,18 @@ public class GestionTallerFrame extends javax.swing.JFrame {
     String tipoDanio;
     float costoArreglo;
     float ingresosTotales;
+
+    public String[] datosAEditar;
+    public float valorActual;
+    public float valorNuevo;
     //endregion 
 
-    public GestionTallerFrame() {
+    public GestionTallerFrame() throws IOException {
         ruta = "TallerAutos.txt";
         initComponents();
         this.setVisible(true);
         consultar();
+        datosAEditar = new String[12];
     }
 
     @SuppressWarnings("unchecked")
@@ -394,6 +399,11 @@ public class GestionTallerFrame extends javax.swing.JFrame {
         });
 
         buttonEdit.setText("Editar");
+        buttonEdit.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                buttonEditActionPerformed(evt);
+            }
+        });
 
         buttonDelete.setText("Eliminar");
         buttonDelete.addActionListener(new java.awt.event.ActionListener() {
@@ -548,7 +558,11 @@ public class GestionTallerFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_textIngresosTotalesActionPerformed
 
     private void registerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_registerActionPerformed
-        registrarIngresoTaller();
+        try {
+            registrarIngresoTaller();
+        } catch (IOException ex) {
+            Logger.getLogger(GestionTallerFrame.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }//GEN-LAST:event_registerActionPerformed
 
     private void buttonSearchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonSearchActionPerformed
@@ -575,6 +589,8 @@ public class GestionTallerFrame extends javax.swing.JFrame {
                 if (tableSearch.getRowCount() > 0) {
                     EliminarFila(tableSearch, 0);
                 }
+            } catch (IOException ex) {
+                Logger.getLogger(GestionTallerFrame.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
     }//GEN-LAST:event_buttonSearchActionPerformed
@@ -582,8 +598,13 @@ public class GestionTallerFrame extends javax.swing.JFrame {
     private void buttonDeleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonDeleteActionPerformed
         if (tableSearch.getRowCount() > 0) {
             String cedula = tableSearch.getValueAt(0, 3).toString();
-            String message = eliminarRegistro(cedula);
-            if (message != null) {
+            boolean eliminado = false;
+            try {
+                eliminado = eliminar(cedula);
+            } catch (IOException ex) {
+                Logger.getLogger(GestionTallerFrame.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            if (eliminado) {
                 restarTotal();
                 for (int i = 0; i < tableQuery.getRowCount(); i++) {
                     if (cedula.equals(tableQuery.getValueAt(i, 3))) {
@@ -591,7 +612,7 @@ public class GestionTallerFrame extends javax.swing.JFrame {
                         EliminarFila(tableSearch, 0);
                     }
                 }
-                JOptionPane.showMessageDialog(null, message);
+                JOptionPane.showMessageDialog(null, "Registro eliminado con éxito");
             } else {
                 JOptionPane.showMessageDialog(null, "No se ha podido eliminar el registro");
             }
@@ -600,8 +621,18 @@ public class GestionTallerFrame extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_buttonDeleteActionPerformed
 
+    private void buttonEditActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonEditActionPerformed
+        if (tableSearch.getRowCount() > 0) {
+            String[] datosAEditar = obtenerDatosAEditar();
+            EditarForm editarForm = new EditarForm(this, datosAEditar);
+            editarForm.setVisible(true);
+        } else {
+            JOptionPane.showMessageDialog(null, "Debe buscar el registro a eliminar");
+        }
+    }//GEN-LAST:event_buttonEditActionPerformed
+
     //region Metodos Ingreso auto al parqueadero
-    void registrarIngresoTaller() {
+    void registrarIngresoTaller() throws IOException {
         String message = asignarDatosFormulario();
         if (existeCampoVacio()) {
             JOptionPane.showMessageDialog(null, "Verifique que todos los campos estén digitados");
@@ -681,122 +712,217 @@ public class GestionTallerFrame extends javax.swing.JFrame {
                 + placa + ";" + marca + ";" + color + ";" + numeroLlantas + ";" + tipoDanio + ";" + costoArreglo;
     }
 
-    String agregarNuevoIngreso(String linea) {
+    String crearLineaAEditar() {
+        return datosAEditar[0] + ";" + datosAEditar[1] + ";" + datosAEditar[2] + ";"
+                + datosAEditar[3] + ";" + datosAEditar[4] + ";" + datosAEditar[5] + ";"
+                + datosAEditar[6] + ";" + datosAEditar[7] + ";" + datosAEditar[8] + ";"
+                + datosAEditar[9] + ";" + datosAEditar[10] + ";" + datosAEditar[11];
+    }
+
+    String agregarNuevoIngreso(String linea) throws IOException {
+        FileWriter fileWriter = null;
+        PrintWriter printWriter = null;
         try {
             file = new File(ruta);
-            FileWriter fileWriter = new FileWriter(file, true);
-            PrintWriter printWriter = new PrintWriter(fileWriter);
+            fileWriter = new FileWriter(file, true);
+            printWriter = new PrintWriter(fileWriter);
             printWriter.println(linea);
-            fileWriter.close();
-            printWriter.close();
             return "Registro exitoso";
         } catch (IOException ex) {
             Logger.getLogger(GestionTallerFrame.class.getName()).log(Level.SEVERE, null, ex);
+        } finally {
+            printWriter.close();
+            fileWriter.close();
         }
         return null;
     }
 
-    String[] buscarCliente(String cedula) {
+    String[] buscarCliente(String cedula) throws IOException {
+        FileReader fileReader = null;
+        BufferedReader bufferedReader = null;
         try {
             file = new File(ruta);
             if (file.exists()) {
                 String linea;
-                FileReader fileReader = new FileReader(file);
-                BufferedReader bufferedReader = new BufferedReader(fileReader);
+                fileReader = new FileReader(file);
+                bufferedReader = new BufferedReader(fileReader);
                 while ((linea = bufferedReader.readLine()) != null) {
                     String[] datos = linea.split(";");
                     if (datos[3].equals(cedula)) {
                         return datos;
                     }
                 }
-                fileReader.close();
-                bufferedReader.close();
             }
         } catch (FileNotFoundException ex) {
             Logger.getLogger(GestionTallerFrame.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
             Logger.getLogger(GestionTallerFrame.class.getName()).log(Level.SEVERE, null, ex);
+        } finally {
+            bufferedReader.close();
+            fileReader.close();
         }
         return null;
     }
 
-    String eliminarRegistro(String cedula) {
-        String[] lineas = obtenerLineas(cedula);
-        boolean eliminado = borrarFichero();
-        if (eliminado) {
-            for (String lineaNueva : lineas) {
-                agregarNuevoIngreso(lineaNueva);
-            }
-            return "Registro eliminado con éxito";
-        }
-        return null;
-    }
-
-    int obtenerNumeroLineas() {
+    //region Eliminar
+    public boolean eliminar(String cedulaPropietario) throws IOException {
+        FileWriter fileWriter = null;
+        PrintWriter printWriter = null;
         try {
-            file = new File(ruta);
-            if (file.exists()) {
-                String linea;
-                FileReader fileReader = new FileReader(file);
-                BufferedReader bufferedReader = new BufferedReader(fileReader);
-                int numeroLineas = Integer.parseInt(String.valueOf(bufferedReader.lines().count()));
-                fileReader.close();
-                bufferedReader.close();
-                return numeroLineas;
-            }
-        } catch (FileNotFoundException ex) {
-            Logger.getLogger(GestionTallerFrame.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IOException ex) {
-            Logger.getLogger(GestionTallerFrame.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        return 0;
-    }
-
-    String[] obtenerLineas(String cedula) {
-        try {
-            file = new File(ruta);
-            if (file.exists()) {
-                String linea = "";
-                int i = 0;
-                String[] lineas = new String[obtenerNumeroLineas() - 1];
-                FileReader fileReader = new FileReader(file);
-                BufferedReader bufferedReader = new BufferedReader(fileReader);
-                while ((linea = bufferedReader.readLine()) != null) {
-                    String[] datos = linea.split(";");
-                    if (!cedula.equals(datos[3])) {
-                        lineas[i] = linea;
-                        i++;
+            String[] lineas = this.obtenerLineasArchivo();
+            if (this.file.delete()) {
+                fileWriter = new FileWriter(file, true);
+                printWriter = new PrintWriter(fileWriter);
+                for (int i = 0; i < lineas.length; i++) {
+                    String cedulaAVerificar = lineas[i].split(";")[3];
+                    if (!cedulaPropietario.equals(cedulaAVerificar)) {
+                        printWriter.println(lineas[i]);
                     }
                 }
-                fileReader.close();
-                bufferedReader.close();
+                return true;
+            }
+        } finally {
+            printWriter.close();
+            fileWriter.close();
+        }
+        return false;
+    }
+
+    String[] obtenerLineasArchivo() throws IOException, IOException {
+        FileReader fileReader = null;
+        BufferedReader bufferedReader = null;
+        try {
+            if (file.exists()) {
+                String linea;
+                fileReader = new FileReader(ruta);
+                bufferedReader = new BufferedReader(fileReader);
+                int numeroRegistros = obtenerNumeroRegistros();
+                String[] lineas = new String[numeroRegistros];
+                for (int i = 0; i < numeroRegistros; i++) {
+                    lineas[i] = bufferedReader.readLine();
+                }
                 return lineas;
             }
         } catch (FileNotFoundException ex) {
             Logger.getLogger(GestionTallerFrame.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
             Logger.getLogger(GestionTallerFrame.class.getName()).log(Level.SEVERE, null, ex);
+        } finally {
+            bufferedReader.close();
+            fileReader.close();
         }
-        return null;
+        return new String[0];
+    }
+
+    int obtenerNumeroRegistros() throws IOException {
+        FileReader fileReader = null;
+        BufferedReader bufferedReader = null;
+        try {
+            int cont = 0;
+            if (file.exists()) {
+                String linea;
+                fileReader = new FileReader(ruta);
+                bufferedReader = new BufferedReader(fileReader);
+                while ((linea = bufferedReader.readLine()) != null) {
+                    cont += 1;
+                }
+            }
+            return cont;
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(GestionTallerFrame.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(GestionTallerFrame.class.getName()).log(Level.SEVERE, null, ex);
+        } finally {
+            bufferedReader.close();
+            fileReader.close();
+        }
+        return 0;
+    }
+
+    //endregion
+    //region Editar
+    public void finalizarEdicion(float valorActual) {
+        boolean editado = false;
+        try {
+            editado = editar();
+        } catch (IOException ex) {
+            Logger.getLogger(GestionTallerFrame.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        if (editado) {
+            editarTotal(valorActual, Float.parseFloat(datosAEditar[11]));
+            for (int i = 0; i < tableQuery.getRowCount(); i++) {
+                if (datosAEditar[3].equals(tableQuery.getValueAt(i, 3))) {
+                    for (int j = 0; j < 12; j++) {
+                        EditarFila(tableQuery, i, j, datosAEditar[j]);
+                        EditarFila(tableSearch, 0, j, datosAEditar[j]);
+                    }
+                }
+            }
+            JOptionPane.showMessageDialog(null, "Registro editado con éxito");
+        } else {
+            JOptionPane.showMessageDialog(null, "No se ha podido editar el registro");
+        }
+    }
+
+    String[] obtenerDatosAEditar() {
+        String[] datos = new String[12];
+        datos[0] = String.valueOf(tableSearch.getValueAt(0, 0));
+        datos[1] = String.valueOf(tableSearch.getValueAt(0, 1));
+        datos[2] = String.valueOf(tableSearch.getValueAt(0, 2));
+        datos[3] = String.valueOf(tableSearch.getValueAt(0, 3));
+        datos[4] = String.valueOf(tableSearch.getValueAt(0, 4));
+        datos[5] = String.valueOf(tableSearch.getValueAt(0, 5));
+        datos[6] = String.valueOf(tableSearch.getValueAt(0, 6));
+        datos[7] = String.valueOf(tableSearch.getValueAt(0, 7));
+        datos[8] = String.valueOf(tableSearch.getValueAt(0, 8));
+        datos[9] = String.valueOf(tableSearch.getValueAt(0, 9));
+        datos[10] = String.valueOf(tableSearch.getValueAt(0, 10));
+        datos[11] = String.valueOf(tableSearch.getValueAt(0, 11));
+        return datos;
+    }
+
+    boolean editar() throws IOException {
+        FileWriter fileWriter = null;
+        PrintWriter printWriter = null;
+        try {
+            String[] lineas = this.obtenerLineasArchivo();
+            if (this.file.delete()) {
+                fileWriter = new FileWriter(file, true);
+                printWriter = new PrintWriter(fileWriter);
+                for (int i = 0; i < lineas.length; i++) {
+                    String cedulaAVerificar = lineas[i].split(";")[3];
+                    if (!datosAEditar[3].equals(cedulaAVerificar)) {
+                        printWriter.println(lineas[i]);
+                    } else {
+                        printWriter.println(crearLineaAEditar());
+                    }
+                }
+                return true;
+            }
+        } finally {
+            printWriter.close();
+            fileWriter.close();
+        }
+        return false;
     }
 
     //endregion
     //region Metodos Consulta
-    void consultar() {
+    void consultar() throws IOException {
+        FileReader fileReader = null;
+        BufferedReader bufferedReader = null;
         try {
             file = new File(ruta);
             if (file.exists()) {
                 String linea;
-                FileReader fileReader = new FileReader(file);
-                BufferedReader bufferedReader = new BufferedReader(fileReader);
+                fileReader = new FileReader(file);
+                bufferedReader = new BufferedReader(fileReader);
                 ingresosTotales = 0;
                 while ((linea = bufferedReader.readLine()) != null) {
                     String[] datos = linea.split(";");
                     InsertarFila(tableQuery, datos);
                     sumarTotal(datos[11]);
                 }
-                fileReader.close();
-                bufferedReader.close();
             }
         } catch (FileNotFoundException ex) {
             Logger.getLogger(GestionTallerFrame.class
@@ -805,6 +931,9 @@ public class GestionTallerFrame extends javax.swing.JFrame {
         } catch (IOException ex) {
             Logger.getLogger(GestionTallerFrame.class
                     .getName()).log(Level.SEVERE, null, ex);
+        } finally {
+            bufferedReader.close();
+            fileReader.close();
         }
     }
 
@@ -820,6 +949,11 @@ public class GestionTallerFrame extends javax.swing.JFrame {
         model.removeRow(index);
     }
 
+    public void EditarFila(JTable table, int fila, int columna, String valor) {
+        DefaultTableModel model = (DefaultTableModel) table.getModel();
+        model.setValueAt(String.valueOf(valor), fila, columna);
+    }
+
     public void sumarTotal(String valor) {
         ingresosTotales += Float.parseFloat(valor);
         textIngresosTotales.setText(String.valueOf(ingresosTotales));
@@ -833,19 +967,6 @@ public class GestionTallerFrame extends javax.swing.JFrame {
     public void editarTotal(float valorActual, float valorNuevo) {
         ingresosTotales = ingresosTotales - valorActual + valorNuevo;
         textIngresosTotales.setText(String.valueOf(ingresosTotales));
-    }
-
-    boolean borrarFichero() {
-        try {
-            file = new File(ruta);
-            if (file.exists()) {
-                boolean eliminado = file.delete();
-                return eliminado;
-            }
-        } catch (Exception e) {
-            System.out.println(e);
-        }
-        return false;
     }
 
     //endregion
